@@ -69,6 +69,12 @@ def load_test_labels(filename='./gzip/emnist-digits-test-labels-idx1-ubyte.gz'):
         f.close()
         return labels
 
+#
+# labels:  List<int>
+# targets: List<List<int>>
+# inputs:  List<List<float28x28>>
+#
+
 
 def load_training_data(batch_size=10000, shuffle=False):
     _data = load_training_images()
@@ -93,7 +99,7 @@ def load_training_data(batch_size=10000, shuffle=False):
                 if(idx < start):
                     raise Exception('you should take a look..')
                 labels.append(_labels[idx])
-                targets.append([float(0) if index != _labels[idx] else float(1)
+                targets.append([int(0) if index != _labels[idx] else int(1)
                                 for index in range(10)])
                 inputs.append([round(float(c/255), 2)
                               for _ in data for c in _])
@@ -116,7 +122,7 @@ def load_test_data():
     inputs = []
     for data in _data:
         labels.append(_labels[idx])
-        targets.append([float(0) if index != _labels[idx] else float(1)
+        targets.append([int(0) if index != _labels[idx] else int(1)
                         for index in range(10)])
         inputs.append([round(float(c/255), 2)
                        for _ in data for c in _])

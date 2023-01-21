@@ -7,7 +7,7 @@ def launch_test(weight_inputs_to_hiddens, biases_inputs_to_hiddens, weight_hidde
     print("Testing Model")
 
     labels, targets, inputs = data.load_test_data()
-    print(f"Found {len(inputs)} images.")
+    print(f"Starting Test")
     predictions_hiddens = [[sum([weight*activation for weight, activation in zip(weights, inp)]) +
                             bias for weights, bias in zip(weight_inputs_to_hiddens, biases_inputs_to_hiddens)] for inp in inputs]
     activations_hiddens = [[max(0, prediction) for prediction in predictions]

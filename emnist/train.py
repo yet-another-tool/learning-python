@@ -1,5 +1,6 @@
+from learning_rate import dynamic_learning_rate
 import data
-from test import launch_test
+from wtest import launch_test
 import wutils
 import random
 import fns as f
@@ -22,7 +23,7 @@ def train(epochs, batch_size, learning_rate, shuffle, input_count, hidden_count,
         print("Initialize new configurations")
         wutils.save_to_file(report_path,
                             f'# Started: {datetime.now()}, epochs: {epochs}, batch_size: {batch_size}, learning_rate: {learning_rate}, input_count: {input_count}, hidden_count: {hidden_count}, output_count: {output_count}, shuffle: {shuffle}',
-                            'timestamp,epoch_took,batch_took,epoch,cost,progress,progress_made,memory_usage,accuracy,training_took')
+                            'timestamp,epoch_took,batch_took,epoch,cost,progress,progress_made,memory_usage,accuracy,training_took,learning_rate')
         weight_inputs_to_hiddens = [
             [random.random() - 0.5 for _ in range(input_count)] for _ in range(hidden_count)]
         weight_hiddens_to_outputs = [
@@ -70,8 +71,10 @@ def train(epochs, batch_size, learning_rate, shuffle, input_count, hidden_count,
             if last_cost == None:
                 last_cost = cost
             progress = wutils.check_progress(last_cost, cost)
+            learning_rate = dynamic_learning_rate(
+                learning_rate, progress, 0.05, 0.05)
             print(
-                f"Epoch: {epoch} / {epochs}, Cost: {cost:.8f}, Change: {progress:.2f}")
+                f"Epoch: {epoch} / {epochs}, Cost: {cost:.8f}, Change: {progress:.8f}")
             last_cost = cost
 
             # Back Propagation
@@ -126,9 +129,7 @@ def train(epochs, batch_size, learning_rate, shuffle, input_count, hidden_count,
             print(
                 f"Batch Took: {timedelta(seconds=batch_end_time - batch_start_time)}")
             wutils.report(report_path, datetime.now(), None, timedelta(
-                seconds=batch_end_time - batch_start_time), epoch, cost, progress, 1 if progress > 0 else 0, wutils.get_memory_usage(), None, None)
-            accuracy = launch_test(weight_inputs_to_hiddens, biases_inputs_to_hiddens,
-                                   weight_hiddens_to_outputs, biases_hiddens_to_outputs)
+                seconds=batch_end_time - batch_start_time), epoch, cost, progress, 1 if progress > 0 else 0, wutils.get_memory_usage(), None, None, learning_rate)
 
         end_time = time.monotonic()
         print(f"Epoch Took: {timedelta(seconds=end_time - start_time)}")
@@ -137,22 +138,22 @@ def train(epochs, batch_size, learning_rate, shuffle, input_count, hidden_count,
                             biases_inputs_to_hiddens, biases_hiddens_to_outputs)
 
         wutils.report(report_path, datetime.now(), timedelta(seconds=end_time - start_time), timedelta(
-            seconds=batch_end_time - batch_start_time), epoch, cost, progress, 1 if progress > 0 else 0, wutils.get_memory_usage(), None, None)
+            seconds=batch_end_time - batch_start_time), epoch, cost, progress, 1 if progress > 0 else 0, wutils.get_memory_usage(), None, None, learning_rate)
 
         # Test each epoch to validate progression
         accuracy = launch_test(weight_inputs_to_hiddens, biases_inputs_to_hiddens,
                                weight_hiddens_to_outputs, biases_hiddens_to_outputs)
         wutils.report(report_path, datetime.now(), timedelta(seconds=end_time - start_time), timedelta(
-            seconds=batch_end_time - batch_start_time), epoch, cost, progress, 1 if progress > 0 else 0, wutils.get_memory_usage(), accuracy, None)
+            seconds=batch_end_time - batch_start_time), epoch, cost, progress, 1 if progress > 0 else 0, wutils.get_memory_usage(), accuracy, None, learning_rate)
 
     training_end_time = time.monotonic()
     print(
         f"Training Took: {timedelta(seconds=training_end_time - training_start_time)}")
     wutils.report(report_path, datetime.now(), None, None,
-                  None, None, None, None, None, timedelta(seconds=training_end_time - training_start_time))
+                  None, None, None, None, None, timedelta(seconds=training_end_time - training_start_time), learning_rate)
 
     # Final test after all epochs
     accuracy = launch_test(weight_inputs_to_hiddens, biases_inputs_to_hiddens,
                            weight_hiddens_to_outputs, biases_hiddens_to_outputs)
     wutils.report(report_path, datetime.now(), None, None, None,
-                  None, None, None, wutils.get_memory_usage(), accuracy, None)
+                  None, None, None, wutils.get_memory_usage(), accuracy, None, learning_rate)

@@ -1,2 +1,7 @@
 .DS_Store
 gzip/
+__pycache__
+config.txt
+_data.bin
+report.csv
+test_results.txt
