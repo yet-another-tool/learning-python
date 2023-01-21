@@ -1,8 +1,9 @@
 from enum import Enum
 import math
 import random
+import hashlib
 
-random.seed(3691236912369123691236912)
+random.seed(36912369123691236912369123691236912369123691236912)
 
 
 class Word(str, Enum):
@@ -35,17 +36,6 @@ def demand(state):
 
 def reverse(str):
     return str[::-1]
-
-
-# I totally broke that one with my random stuff :/
-# def decode(encoded):
-#     decoded = ""
-#     for index, l in enumerate(encoded):
-#         if(index != 0 and l == reverse(encoded[index-1])):
-#             decoded += ' '.join([Word[_] for _ in reverse(l)]) + ' '
-#         else:
-#             decoded += ' '.join([Word[_] for _ in l]) + ' '
-#     return decoded
 
 
 def encode(str):
@@ -109,5 +99,5 @@ print()
 print("Encoded: ")
 print(''.join(encoded))
 print()
-# print("Decoded: ")
-# print(decode(encoded) == history)
+
+print(f"Hash: {hashlib.sha256(''.join(encoded).encode('ascii')).hexdigest()}")
