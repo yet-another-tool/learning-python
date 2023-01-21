@@ -2,6 +2,7 @@ import sys
 import getopt
 
 from train import train
+from train_gpu import train_gpu
 
 
 def main(argv):
@@ -52,8 +53,12 @@ def main(argv):
     print('config_path: ', config_path)
     print('with_gpu: ', with_gpu)
 
-    train(epochs, batch_size, learning_rate, shuffle,
-          input_count, hidden_count, output_count, report_path, config_path)
+    if with_gpu == True:
+        train_gpu(epochs, batch_size, learning_rate, shuffle,
+                  input_count, hidden_count, output_count, report_path, config_path)
+    else:
+        train(epochs, batch_size, learning_rate, shuffle,
+              input_count, hidden_count, output_count, report_path, config_path)
 
 
 if __name__ == "__main__":
